@@ -1,0 +1,10 @@
+[
+  {"name": "GitHub", "url": "https://github.com/{}"},
+  {"name": "Reddit", "url": "https://www.reddit.com/user/{}"},
+  {"name": "Medium", "url": "https://medium.com/@{}"},
+  {"name": "Dev.to", "url": "https://dev.to/{}"},
+  {"name": "GitLab", "url": "https://gitlab.com/{}"},
+  {"name": "Codeberg", "url": "https://codeberg.org/{}"},
+  {"name": "Bitbucket", "url": "https://bitbucket.org/{}/"},
+  {"name": "Keybase", "url": "https://keybase.io/{}"}
+]

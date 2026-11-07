@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Footprint Finder</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 16px; }
+    input[type=text] { padding: 8px; width: 250px; }
+    button { padding: 8px 16px; cursor: pointer; }
+    button:disabled { cursor: not-allowed; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    .match { color: green; font-weight: bold; }
+    .nf { color: grey; }
+    .err { color: orange; }
+    .note { font-size: 13px; color: #555; margin-top: 16px; }
+    .row { margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Footprint Finder</h1>
+  <p>Check where a username or name exists across websites.</p>
+
+  <label>
+    <input type="checkbox" id="consent" onchange="toggle()">
+    I'm searching for myself or have this person's permission.
+  </label>
+
+  <div class="row" style="margin-top:16px">
+    <input type="text" id="username" placeholder="Enter a username">
+    <button id="btn1" disabled onclick="searchUser()">Search username</button>
+  </div>
+
+  <div class="row">
+    <input type="text" id="fullname" placeholder="Enter first and last name">
+    <button id="btn2" disabled onclick="searchName()">Search name</button>
+  </div>
+
+  <div id="out"></div>
+<div id="manual" style="margin-top:20px">
+  <h3>Check manually (these sites block automatic checks)</h3>
+  <div id="manuallinks">Type a username above to get links.</div>
+</div>
+<script>
+  const manualSites = [
+    ["Instagram", "https://www.instagram.com/"],
+    ["Facebook", "https://www.facebook.com/"],
+    ["Snapchat", "https://www.snapchat.com/add/"]
+  ];
+  function updateManual() {
+    const name = document.getElementById("username").value.trim();
+    const box = document.getElementById("manuallinks");
+    box.textContent = "";
+    if (!/^[A-Za-z0-9._-]{1,30}$/.test(name)) {
+      box.textContent = "Type a username above to get links.";
+      return;
+    }
+    for (const [site, base] of manualSites) {
+      const a = document.createElement("a");
+      a.href = base + encodeURIComponent(name);
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = "Open " + site + " profile for " + name;
+      a.style.display = "block";
+      box.appendChild(a);
+    }
+  }
+  document.getElementById("username").addEventListener("input", updateManual);
+</script>
+
+  <h3>Reverse image search (opens in a new tab)</h3>
+  <button onclick="window.open('https://lens.google.com')">Google Lens</button>
+  <button onclick="window.open('https://tineye.com')">TinEye</button>
+
+  <p class="note">A match means the username exists on that site, not that it belongs to the same person. Name search only guesses likely usernames, so its results are weak matches.</p>
+
+  <script>
+    const API = "";
+
+    function toggle() {
+      const on = document.getElementById("consent").checked;
+      document.getElementById("btn1").disabled = !on;
+      document.getElementById("btn2").disabled = !on;
+    }
+
+    function badge(status) {
+      return status === "possible match" ? "match" : status === "not found" ? "nf" : "err";
+    }
+
+    async function searchUser() {
+      const name = document.getElementById("username").value.trim();
+      const out = document.getElementById("out");
+      if (!name) { out.textContent = "Please enter a username."; return; }
+      out.textContent = "Searching...";
+      try {
+        const res = await fetch(API + "/search?username=" + encodeURIComponent(name));
+        const data = await res.json();
+        if (data.error) { out.textContent = data.error; return; }
+        let html = "<table><tr><th>Platform</th><th>Status</th><th>Link</th></tr>";
+        for (const r of data.results) {
+          html += "<tr><td>" + r.site + "</td><td class='" + badge(r.status) + "'>" + r.status +
+                  "</td><td><a href='" + r.url + "' target='_blank'>Open</a></td></tr>";
+        }
+        out.innerHTML = html + "</table>";
+      } catch (e) {
+        out.textContent = "Could not reach the backend. Is the PowerShell program still running?";
+      }
+    }
+
+    async function searchName() {
+      const name = document.getElementById("fullname").value.trim();
+      const out = document.getElementById("out");
+      if (!name) { out.textContent = "Please enter a first and last name."; return; }
+      out.textContent = "Searching (this can take a few seconds)...";
+      try {
+        const res = await fetch(API + "/name-search?name=" + encodeURIComponent(name));
+        const data = await res.json();
+        if (data.error) { out.textContent = data.error; return; }
+        let html = "<p>Usernames tried: " + data.tried.join(", ") + "</p>";
+        if (data.results.length === 0) {
+          out.innerHTML = html + "<p>No possible matches found.</p>";
+          return;
+        }
+        html += "<table><tr><th>Username guess</th><th>Platform</th><th>Status</th><th>Link</th></tr>";
+        for (const r of data.results) {
+          html += "<tr><td>" + r.username + "</td><td>" + r.site + "</td><td class='" + badge(r.status) + "'>" +
+                  r.status + " (weak)</td><td><a href='" + r.url + "' target='_blank'>Open</a></td></tr>";
+        }
+        out.innerHTML = html + "</table>";
+      } catch (e) {
+        out.textContent = "Could not reach the backend. Is the PowerShell program still running?";
+      }
+    }
+  </script>
+</body>
+</html>
