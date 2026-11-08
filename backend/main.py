@@ -5,6 +5,10 @@ from fastapi.responses import FileResponse, JSONResponse
 
 BASE = Path(__file__).parent
 app = FastAPI()
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 SITES = json.load(open(BASE / "sites.json"))
 
 hits = {}
