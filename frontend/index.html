@@ -42,29 +42,29 @@
   <div id="manuallinks">Type a username above to get links.</div>
 </div>
 <script>
-  const manualSites = [
-    ["Instagram", "https://www.instagram.com/"],
-    ["Facebook", "https://www.facebook.com/"],
-    ["Snapchat", "https://www.snapchat.com/add/"]
-  ];
-  function updateManual() {
-    const name = document.getElementById("username").value.trim();
-    const box = document.getElementById("manuallinks");
-    box.textContent = "";
-    if (!/^[A-Za-z0-9._-]{1,30}$/.test(name)) {
-      box.textContent = "Type a username above to get links.";
-      return;
-    }
-    for (const [site, base] of manualSites) {
-      const a = document.createElement("a");
-      a.href = base + encodeURIComponent(name);
-      a.target = "_blank";
-      a.rel = "noopener";
-      a.textContent = "Open " + site + " profile for " + name;
-      a.style.display = "block";
-      box.appendChild(a);
-    }
+ const manualSites = [
+  ["Instagram", (n) => "https://www.google.com/search?q=" + encodeURIComponent("site:instagram.com " + n)],
+  ["Facebook", (n) => "https://www.facebook.com/search/people/?q=" + encodeURIComponent(n)],
+  ["Snapchat", (n) => "https://www.snapchat.com/add/" + encodeURIComponent(n)]
+];
+function updateManual() {
+  const name = document.getElementById("username").value.trim();
+  const box = document.getElementById("manuallinks");
+  box.textContent = "";
+  if (!/^[A-Za-z0-9._ -]{1,50}$/.test(name)) {
+    box.textContent = "Type a username above to get links.";
+    return;
   }
+  for (const [site, makeUrl] of manualSites) {
+    const a = document.createElement("a");
+    a.href = makeUrl(name);
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = "Search " + site + " for " + name;
+    a.style.display = "block";
+    box.appendChild(a);
+  }
+}
   document.getElementById("username").addEventListener("input", updateManual);
 </script>
 
