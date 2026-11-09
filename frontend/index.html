@@ -58,7 +58,7 @@ function igVariants(name) {
     const b = parts[parts.length - 1];
     list = [a + b, a + "." + b, a + "_" + b, b + a];
   }
-  return [...new Set(list)].filter((u) => /^[a-z0-9._]{1,30}$/.test(u)).slice(0, 4);
+  return [...new Set(list)].filter((u) => /^[a-z0-9._]{1,30}$/.test(u)).slice(0, 1);
 }
 
 function addLink(box, text, url) {
