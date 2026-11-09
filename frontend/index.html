@@ -43,11 +43,34 @@
 </div>
 <script>
 const manualSites = [
-  ["Instagram profile", (n) => "https://www.instagram.com/" + encodeURIComponent(n.replace(/\s+/g, "")) + "/"],
   ["Facebook profile", (n) => "https://www.facebook.com/" + encodeURIComponent(n.replace(/\s+/g, ""))],
   ["Facebook search", (n) => "https://www.facebook.com/search/people/?q=" + encodeURIComponent(n)],
   ["Snapchat profile", (n) => "https://www.snapchat.com/add/" + encodeURIComponent(n.replace(/\s+/g, ""))]
 ];
+
+function igVariants(name) {
+  const parts = name.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  let list = [];
+  if (parts.length === 1) {
+    list = [parts[0]];
+  } else {
+    const a = parts[0];
+    const b = parts[parts.length - 1];
+    list = [a + b, a + "." + b, a + "_" + b, b + a, b + "." + a, b + "_" + a, a + "." + b[0], a + b[0]];
+  }
+  return [...new Set(list)].filter((u) => /^[a-z0-9._]{1,30}$/.test(u));
+}
+
+function addLink(box, text, url) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.target = "_blank";
+  a.rel = "noopener";
+  a.textContent = text;
+  a.style.display = "block";
+  box.appendChild(a);
+}
+
 function updateManual() {
   const name = document.getElementById("username").value.trim();
   const box = document.getElementById("manuallinks");
@@ -56,14 +79,11 @@ function updateManual() {
     box.textContent = "Type a username above to get links.";
     return;
   }
+  for (const u of igVariants(name)) {
+    addLink(box, "Open Instagram: @" + u, "https://www.instagram.com/" + encodeURIComponent(u) + "/");
+  }
   for (const [site, makeUrl] of manualSites) {
-    const a = document.createElement("a");
-    a.href = makeUrl(name);
-    a.target = "_blank";
-    a.rel = "noopener";
-    a.textContent = "Open " + site + " for " + name;
-    a.style.display = "block";
-    box.appendChild(a);
+    addLink(box, "Open " + site + " for " + name, makeUrl(name));
   }
 }
   document.getElementById("username").addEventListener("input", updateManual);
