@@ -49,18 +49,18 @@ const manualSites = [
 ];
 
 function igVariants(name) {
-  const parts = name.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  const parts = name.toLowerCase().trim().split(/[\s._-]+/).filter(Boolean);
   let list = [];
   if (parts.length === 1) {
-    list = [parts[0]];
+    const u = parts[0];
+    list = [u, u + "_", "_" + u, u + ".official", "the." + u, "real." + u, u + "_official", u + "1", u + "123", "its." + u];
   } else {
     const a = parts[0];
     const b = parts[parts.length - 1];
-    list = [a + b, a + "." + b, a + "_" + b, b + a, b + "." + a, b + "_" + a, a + "." + b[0], a + b[0]];
+    list = [a + b, a + "." + b, a + "_" + b, b + a, b + "." + a, b + "_" + a, a + "." + b[0], a + b[0], a + "_official", "real." + a + b];
   }
   return [...new Set(list)].filter((u) => /^[a-z0-9._]{1,30}$/.test(u));
 }
-
 function addLink(box, text, url) {
   const a = document.createElement("a");
   a.href = url;
