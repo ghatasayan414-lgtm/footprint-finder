@@ -44,7 +44,7 @@
 <script>
 const manualSites = [
   { name: "Instagram", bg: "linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)", color: "#fff", url: (u) => "https://www.instagram.com/" + encodeURIComponent(u) + "/" },
-    { name: "Facebook", bg: "#1877f2", color: "#fff", url: (u) => "https://www.facebook.com/search/people/?q=" + encodeURIComponent(u) },
+  { name: "Facebook", bg: "#1877f2", color: "#fff", url: (u) => "https://www.facebook.com/" + encodeURIComponent(u), search: (n) => "https://www.facebook.com/search/people/?q=" + encodeURIComponent(n) },
   { name: "Snapchat", bg: "#fffc00", color: "#000", url: (u) => "https://www.snapchat.com/add/" + encodeURIComponent(u) }
 ];
 
